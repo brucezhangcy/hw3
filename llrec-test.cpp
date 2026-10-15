@@ -28,38 +28,41 @@ void print(Node* head);
 void dealloc(Node* head);
 
 
+// Recursive helper: reads the remaining integers in the stream into a list
+Node* readRest(ifstream& ifile)
+{
+    int v;
+    if( ! (ifile >> v) ) return NULL;
+    Node* h = new Node(v, NULL);
+    h->next = readRest(ifile);
+    return h;
+}
+
 Node* readList(const char* filename)
 {
-    Node* h = NULL;
     ifstream ifile(filename);
-    int v;
-    if( ! (ifile >> v) ) return h;
-    h = new Node(v, NULL);
-    Node *t = h;
-    while ( ifile >> v ) {
-        t->next = new Node(v, NULL);
-        t = t->next;
-    }
-    return h;
+    return readRest(ifile);
+}
+
+// Recursive helper: prints each value then moves to the next node
+void printRest(Node* head)
+{
+    if(head == NULL) return;
+    cout << head->val << " ";
+    printRest(head->next);
 }
 
 void print(Node* head)
 {
-    while(head) {
-        cout << head->val << " ";
-        head = head->next;
-    }
+    printRest(head);
     cout << endl;
 }
 
 void dealloc(Node* head)
 {
-    Node* temp;
-    while(head) {
-        temp = head->next;
-        delete head;
-        head = temp;
-    }
+    if(head == NULL) return;
+    dealloc(head->next);
+    delete head;
 }
 
 // -----------------------------------------------
@@ -67,14 +70,14 @@ void dealloc(Node* head)
 //   function object struct declarations
 // -----------------------------------------------
 
-// Returns true for odd values (so odd values get filtered out)
+// Returns true when the value is odd (so odd values get filtered out)
 struct IsOdd {
     bool operator()(int value) {
         return value % 2 != 0;
     }
 };
 
-// Returns true for values greater than a threshold
+// Returns true when the value is greater than a threshold
 struct GreaterThan {
     GreaterThan(int t) : threshold(t) {}
     bool operator()(int value) {
