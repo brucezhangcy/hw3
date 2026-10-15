@@ -67,6 +67,21 @@ void dealloc(Node* head)
 //   function object struct declarations
 // -----------------------------------------------
 
+// Returns true for odd values (so odd values get filtered out)
+struct IsOdd {
+    bool operator()(int value) {
+        return value % 2 != 0;
+    }
+};
+
+// Returns true for values greater than a threshold
+struct GreaterThan {
+    GreaterThan(int t) : threshold(t) {}
+    bool operator()(int value) {
+        return value > threshold;
+    }
+    int threshold;
+};
 
 
 
@@ -87,9 +102,38 @@ int main(int argc, char* argv[])
 
     // Test out your linked list code
 
+    // llpivot: start smaller/larger as garbage on purpose
+    Node* smaller = (Node*) 0x1;
+    Node* larger = (Node*) 0x1;
+    llpivot(head, smaller, larger, 10);
+    cout << "Pivot 10 -> smaller: ";
+    print(smaller);
+    cout << "Pivot 10 -> larger: ";
+    print(larger);
+    cout << "Head after pivot: ";
+    print(head);
 
+    // llfilter: remove odd values from smaller, values > 15 from larger
+    smaller = llfilter(smaller, IsOdd());
+    cout << "smaller without odds: ";
+    print(smaller);
+    larger = llfilter(larger, GreaterThan(15));
+    cout << "larger without values > 15: ";
+    print(larger);
 
-    
+    dealloc(smaller);
+    dealloc(larger);
+
+    // Empty list cases
+    Node* empty = NULL;
+    llpivot(empty, smaller, larger, 5);
+    cout << "Empty pivot -> smaller: ";
+    print(smaller);
+    cout << "Empty pivot -> larger: ";
+    print(larger);
+    cout << "Empty filter: ";
+    print(llfilter(empty, IsOdd()));
+
     return 0;
 
 }
